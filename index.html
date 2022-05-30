@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            <title>SG PSI Info</title>
+
+            <!-- Viewport for responsive web design -->
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <!-- Jquery import -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>            
+
+            <!-- CSS Bootstrap import -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+            <!-- CSS Google fonts import -->
+            <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        
+            <!-- CSS style sheet -->
+            <style>
+                body
+                {
+                    background-image: url("https://static.vecteezy.com/system/resources/previews/002/170/925/non_2x/singapore-downtown-skyline-bay-area-free-photo.jpg");
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-attachment: fixed;
+                    background-size: cover;
+                }
+                h1
+                {
+                    color: lightskyblue;
+                    font-size: 50px;
+                    text-align: center;
+                    font-family: 'Roboto', sans-serif;
+                }
+                .header
+                {
+                    background: black;
+                    opacity: 80%;
+                }
+                table
+                {
+                    opacity: 95%;
+                }
+            </style>
+        </head>
+
+    <body>
+        <div class="header">
+            <h1>Singapore PSI Information</h1>
+        </div>
+
+        <script>
+            $.ajax({
+                url:'https://api.data.gov.sg/v1/environment/psi',
+                success:function(data)
+                {
+                    //Retrieve API data
+                    let readings = data.items[0].readings;
+                    //console.log(readings);
+                    let timestamp = data.items[0].update_timestamp;
+                    //console.log(timestamp);
+
+                    //Format timestamp to readable format based on system locale and display timestamp
+                    let formatted_timestamp = new Date(timestamp).toLocaleString('en-SG');
+                    document.getElementById("timestamp").innerHTML = "Last updated on: " + formatted_timestamp;
+
+                    //Obtain metric information
+                    let metrics = Object.keys(readings);
+                    //console.log(metrics);
+
+                    //Obtain readings for each metric as per region
+                    for(var i = 0; i < metrics.length; i++) 
+                    {
+                        let metric = metrics[i];
+                        let reading_north = readings[metrics[i]].north;
+                        let reading_south = readings[metrics[i]].south;
+                        let reading_east = readings[metrics[i]].east;                    
+                        let reading_west = readings[metrics[i]].west;
+                        let reading_central = readings[metrics[i]].central;
+                        let reading_national = readings[metrics[i]].national;
+
+                        //Output metrics and their readings for each region to a table
+                        $('#psiTable').append('<tbody><tr>'
+                            + '<td>' + metric + '</td>'
+                            + '<td>' + reading_north + '</td>'
+                            + '<td>' + reading_south + '</td>'
+                            + '<td>' + reading_east + '</td>'
+                            + '<td>' + reading_west + '</td>'
+                            + '<td>' + reading_central + '</td>'
+                            + '<td>' + reading_national + '</td>'
+                            + '</tr></tbody>');
+                    }
+                }
+            });
+        </script>
+
+        <div class="flex-container text-center">
+            <h5>Latest Pollutant Standards Index (PSI) Information from National Environment Agency, Singapore</h5>
+            <p id="timestamp">Timestamp</p>
+        </div>
+
+        <div class="container table-responsive">
+            <table id="psiTable" class="table table-bordered table-hover table-dark text-center">            
+                <thead>
+                    <tr style="color:lightskyblue">
+                        <th>Metric</th>
+                        <th>North</th>
+                        <th>South</th>
+                        <th>East</th>
+                        <th>West</th>
+                        <th>Central</th>
+                        <th>National</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </body>
+</html>
